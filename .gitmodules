@@ -1,0 +1,9 @@
+[submodule "agentic_lab"]
+	path = agentic_lab
+	url = git@github.com:charlieshreck/agentic_lab.git
+[submodule "prod_homelab"]
+	path = prod_homelab
+	url = git@github.com:charlieshreck/prod_homelab.git
+[submodule "monit_homelab"]
+	path = monit_homelab
+	url = git@github.com:charlieshreck/monit_homelab.git

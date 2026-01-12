@@ -1,0 +1,19 @@
+# Claude Code local files
+.claude/
+
+# Backup directories (temporary)
+*.bak/
+
+# OS files
+.DS_Store
+*.swp
+*.swo
+
+# Editor files
+.vscode/
+.idea/
+
+# Sensitive files (should never be here anyway)
+*.tfvars
+.env
+credentials.json
