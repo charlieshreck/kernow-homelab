@@ -70,7 +70,7 @@ git clone --recurse-submodules git@github.com:charlieshreck/kernow-homelab.git
 
 ## MCP Servers
 
-All 19 MCP servers run in the agentic cluster (ai-platform namespace) and are configured in `.mcp.json`:
+All 20 MCP servers run in the agentic cluster (ai-platform namespace) and are configured in `.mcp.json`:
 
 | Server | Port | Purpose |
 |--------|------|---------|
@@ -93,6 +93,7 @@ All 19 MCP servers run in the agentic cluster (ai-platform namespace) and are co
 | homepage | 31092 | Dashboard widgets |
 | neo4j | 31098 | Knowledge graph queries |
 | tasmota | 31100 | Tasmota smart device control (26 devices) |
+| monitoring | 31101 | Monitoring stack (VictoriaMetrics, AlertManager, VictoriaLogs, Grafana, Gatus) |
 
 ## Kubeconfig Paths
 
