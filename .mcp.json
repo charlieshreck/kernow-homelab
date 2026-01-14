@@ -17,6 +17,7 @@
     "browser-automation": { "type": "http", "url": "http://10.20.0.40:31094/mcp" },
     "plex": { "type": "http", "url": "http://10.20.0.40:31096/mcp" },
     "vikunja": { "type": "http", "url": "http://10.20.0.40:31097/mcp" },
-    "neo4j": { "type": "http", "url": "http://10.20.0.40:31098/mcp" }
+    "neo4j": { "type": "http", "url": "http://10.20.0.40:31098/mcp" },
+    "tasmota": { "type": "http", "url": "http://10.20.0.40:31100/mcp" }
   }
 }
