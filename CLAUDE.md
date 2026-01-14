@@ -37,7 +37,7 @@ git submodule update --init --recursive
 git submodule update --remote
 ```
 
-### Work in a Submodule
+### Work in a Submodule (Manual)
 ```bash
 cd agentic_lab/  # or prod_homelab/ or monit_homelab/
 # ... make changes ...
@@ -49,6 +49,19 @@ git add agentic_lab
 git commit -m "Update agentic_lab submodule"
 git push
 ```
+
+### Work in a Submodule (Helper Script - Preferred)
+```bash
+# Single command: commits submodule, pushes, updates parent
+/home/scripts/git-commit-submodule.sh agentic_lab "feat: add new feature"
+/home/scripts/git-commit-submodule.sh monit_homelab "fix: update config"
+/home/scripts/git-commit-submodule.sh prod_homelab "docs: update readme"
+```
+
+**IMPORTANT for Claude**: Always use the helper script to avoid:
+- Committing in wrong directory (parent vs submodule)
+- Forgetting to update parent submodule reference
+- Push failures from incorrect working directory
 
 ### Clone Fresh
 ```bash
