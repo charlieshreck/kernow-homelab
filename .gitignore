@@ -1,5 +1,6 @@
-# Claude Code local files
-.claude/
+# Claude Code local files (cache/tmp only, keep commands)
+.claude/cache/
+.claude/tmp/
 
 # Backup directories (temporary)
 *.bak/
