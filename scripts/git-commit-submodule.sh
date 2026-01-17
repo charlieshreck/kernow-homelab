@@ -17,7 +17,7 @@ fi
 
 SUBMODULE_PATH="$PARENT_DIR/$SUBMODULE"
 
-if [[ ! -d "$SUBMODULE_PATH/.git" ]]; then
+if [[ ! -e "$SUBMODULE_PATH/.git" ]]; then
     echo "Error: $SUBMODULE_PATH is not a git repository"
     exit 1
 fi
