@@ -20,6 +20,9 @@
     "neo4j": { "type": "http", "url": "http://10.20.0.40:31098/mcp" },
     "tasmota": { "type": "http", "url": "http://10.20.0.40:31100/mcp" },
     "monitoring": { "type": "http", "url": "http://10.20.0.40:31101/mcp" },
-    "keep": { "type": "http", "url": "http://10.20.0.40:31107/mcp" }
+    "keep": { "type": "http", "url": "http://10.20.0.40:31107/mcp" },
+    "github": { "type": "http", "url": "http://10.20.0.40:31102/mcp" },
+    "wikipedia": { "type": "http", "url": "http://10.20.0.40:31103/mcp" },
+    "reddit": { "type": "http", "url": "http://10.20.0.40:31104/mcp" }
   }
 }
