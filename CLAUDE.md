@@ -95,8 +95,8 @@ All 24 MCP servers run in the agentic cluster (ai-platform namespace) and are co
 | tasmota | 31100 | Tasmota smart device control (26 devices) |
 | monitoring | 31101 | Monitoring stack (VictoriaMetrics, AlertManager, VictoriaLogs, Grafana, Gatus) |
 | keep | 31107 | Alert aggregation, deduplication, correlation |
-| github | 31102 | GitHub repos, issues, PRs, code search (requires token) |
-| wikipedia | 31103 | Wikipedia articles, search, knowledge retrieval |
+| github | 31111 | GitHub repos, issues, PRs, code search (requires token) |
+| wikipedia | 31112 | Wikipedia articles, search, knowledge retrieval |
 | reddit | 31104 | Reddit browsing, subreddit search, discussions |
 
 ## Kubeconfig Paths
