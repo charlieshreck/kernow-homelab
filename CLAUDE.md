@@ -8,7 +8,7 @@ This repository uses git submodules to organize the three cluster configurations
 
 ```
 /home/                              # kernow-homelab (this repo)
-├── .mcp.json                       # MCP server configuration (19 servers)
+├── .mcp.json                       # MCP server configuration (24 servers)
 ├── CLAUDE.md                       # This file
 ├── agentic_lab/                    # Submodule: AI platform cluster (10.20.0.0/24)
 ├── prod_homelab/                   # Submodule: Production cluster (10.10.0.0/24)
@@ -70,7 +70,7 @@ git clone --recurse-submodules git@github.com:charlieshreck/kernow-homelab.git
 
 ## MCP Servers
 
-All 20 MCP servers run in the agentic cluster (ai-platform namespace) and are configured in `.mcp.json`:
+All 24 MCP servers run in the agentic cluster (ai-platform namespace) and are configured in `.mcp.json`:
 
 | Server | Port | Purpose |
 |--------|------|---------|
@@ -88,12 +88,16 @@ All 20 MCP servers run in the agentic cluster (ai-platform namespace) and are co
 | plex | 31096 | Media server |
 | vikunja | 31097 | Task management |
 | web-search | 31093 | SearXNG search |
-| browser-automation | 31094 | Playwright |
+| browser-automation | 31094 | Playwright browser automation |
 | infisical | 31080 | Secrets (read-only) |
 | homepage | 31092 | Dashboard widgets |
 | neo4j | 31098 | Knowledge graph queries |
 | tasmota | 31100 | Tasmota smart device control (26 devices) |
 | monitoring | 31101 | Monitoring stack (VictoriaMetrics, AlertManager, VictoriaLogs, Grafana, Gatus) |
+| keep | 31107 | Alert aggregation, deduplication, correlation |
+| github | 31102 | GitHub repos, issues, PRs, code search (requires token) |
+| wikipedia | 31103 | Wikipedia articles, search, knowledge retrieval |
+| reddit | 31104 | Reddit browsing, subreddit search, discussions |
 
 ## Kubeconfig Paths
 
