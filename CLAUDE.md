@@ -98,6 +98,7 @@ All 24 MCP servers run in the agentic cluster (ai-platform namespace) and are co
 | github | 31111 | GitHub repos, issues, PRs, code search (requires token) |
 | wikipedia | 31112 | Wikipedia articles, search, knowledge retrieval |
 | reddit | 31104 | Reddit browsing, subreddit search, discussions |
+| outline | 31114 | Outline wiki document management, collections |
 
 ## Kubeconfig Paths
 
