@@ -24,6 +24,6 @@
     "github": { "type": "http", "url": "http://10.20.0.40:31111/mcp" },
     "wikipedia": { "type": "http", "url": "http://10.20.0.40:31112/mcp" },
     "reddit": { "type": "http", "url": "http://10.20.0.40:31104/mcp" },
-    "outline": { "type": "http", "url": "http://10.20.0.40:31105/mcp" }
+    "outline": { "type": "http", "url": "http://10.20.0.40:31114/mcp" }
   }
 }
