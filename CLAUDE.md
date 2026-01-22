@@ -75,58 +75,31 @@ git clone --recurse-submodules git@github.com:charlieshreck/kernow-homelab.git
 
 ## MCP Servers
 
-All 24 MCP servers run in the agentic cluster (ai-platform namespace) and are configured in `.mcp.json`:
+6 consolidated domain MCP servers run in the agentic cluster (ai-platform namespace), accessible via DNS ingress and configured in `.mcp.json`:
 
-| Server | Port | Purpose |
-|--------|------|---------|
-| knowledge | 31084 | Qdrant knowledge base, runbooks, entities |
-| infrastructure | 31083 | kubectl, talosctl, cluster operations |
-| coroot | 31081 | Observability, metrics, anomalies |
-| proxmox | 31082 | VM management |
-| opnsense | 31085 | Firewall, DHCP, DNS |
-| adguard | 31086 | DNS rewrites, filtering |
-| cloudflare | 31087 | DNS records, tunnels |
-| unifi | 31088 | Network clients, devices |
-| truenas | 31089 | Storage management |
-| home-assistant | 31090 | Smart home control |
-| arr-suite | 31091 | Media management |
-| plex | 31096 | Media server |
-| vikunja | 31097 | Task management |
-| web-search | 31093 | SearXNG search |
-| browser-automation | 31094 | Playwright browser automation |
-| infisical | 31080 | Secrets (read-only) |
-| homepage | 31092 | Dashboard widgets |
-| neo4j | 31098 | Knowledge graph queries |
-| tasmota | 31100 | Tasmota smart device control (26 devices) |
-| monitoring | 31101 | Monitoring stack (VictoriaMetrics, AlertManager, VictoriaLogs, Grafana, Gatus) |
-| keep | 31107 | Alert aggregation, deduplication, correlation |
-| github | 31111 | GitHub repos, issues, PRs, code search (requires token) |
-| wikipedia | 31112 | Wikipedia articles, search, knowledge retrieval |
-| reddit | 31104 | Reddit browsing, subreddit search, discussions |
-| outline | 31114 | Outline wiki document management, collections |
+| Domain MCP | Endpoint | Components |
+|------------|----------|------------|
+| observability | observability-mcp.agentic.kernow.io | Keep, Coroot, VictoriaMetrics, AlertManager, Grafana, Gatus |
+| infrastructure | infrastructure-mcp.agentic.kernow.io | Kubernetes, Proxmox, TrueNAS, Cloudflare, OPNsense, Caddy, Infisical |
+| knowledge | knowledge-mcp.agentic.kernow.io | Qdrant, Neo4j, Outline, Vikunja |
+| home | home-mcp.agentic.kernow.io | Home Assistant, Tasmota, UniFi, AdGuard, Homepage |
+| media | media-mcp.agentic.kernow.io | Plex, Sonarr, Radarr, Prowlarr, Overseerr, Tautulli, Transmission, SABnzbd |
+| external | external-mcp.agentic.kernow.io | SearXNG web search, GitHub, Reddit, Wikipedia, Playwright browser |
 
-## MCP Architecture Modernization
+### MCP Access
 
-The MCP infrastructure is transitioning from ConfigMap-embedded Python to pre-built Docker images:
+All domain MCPs use HTTP ingress endpoints:
+```
+http://<domain>-mcp.agentic.kernow.io/mcp    # MCP protocol endpoint
+http://<domain>-mcp.agentic.kernow.io/health # Health check
+```
 
-### Current State (Phase 1)
-- 24 individual MCPs with `stateless_http=True` for Kubernetes stability
-- Code embedded in ConfigMaps (slow startup due to pip install)
+### Architecture
 
-### Target State (Phase 2+)
-- 6 consolidated domain-based MCPs with pre-built Docker images
-- Domains: observability, infrastructure, knowledge, home, media, external
-
-### Consolidated MCP Domains
-
-| Domain | Port | Combines |
-|--------|------|----------|
-| observability-mcp | 31120 | Keep + Coroot + monitoring + Gatus |
-| infrastructure-mcp | TBD | K8s + Proxmox + TrueNAS + Cloudflare + OPNsense |
-| knowledge-mcp | TBD | Qdrant + Outline + Neo4j |
-| home-mcp | TBD | Home Assistant + Tasmota + UniFi + AdGuard |
-| media-mcp | TBD | Plex + Arr-Suite + Tautulli |
-| external-mcp | TBD | Web Search + GitHub + Reddit + Wikipedia |
+- **Pre-built Docker images**: `ghcr.io/charlieshreck/mcp-<domain>:latest`
+- **Source code**: `mcp-servers/domains/<domain>/`
+- **Kubernetes manifests**: `mcp-servers/kubernetes/domains/<domain>.yaml`
+- **Shared utilities**: `mcp-servers/shared/kernow_mcp_common/`
 
 ### Development
 See `mcp-servers/README.md` for:
