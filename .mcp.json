@@ -5,24 +5,14 @@
     "infrastructure": { "type": "http", "url": "http://10.20.0.40:31083/mcp" },
     "knowledge": { "type": "http", "url": "http://10.20.0.40:31084/mcp" },
     "opnsense": { "type": "http", "url": "http://10.20.0.40:31085/mcp" },
-    "adguard": { "type": "http", "url": "http://10.20.0.40:31086/mcp" },
     "cloudflare": { "type": "http", "url": "http://10.20.0.40:31087/mcp" },
-    "unifi": { "type": "http", "url": "http://10.20.0.40:31088/mcp" },
     "truenas": { "type": "http", "url": "http://10.20.0.40:31089/mcp" },
-    "home-assistant": { "type": "http", "url": "http://10.20.0.40:31090/mcp" },
-    "arr-suite": { "type": "http", "url": "http://10.20.0.40:31091/mcp" },
-    "homepage": { "type": "http", "url": "http://10.20.0.40:31092/mcp" },
-    "web-search": { "type": "http", "url": "http://10.20.0.40:31093/mcp" },
-    "browser-automation": { "type": "http", "url": "http://10.20.0.40:31094/mcp" },
-    "plex": { "type": "http", "url": "http://10.20.0.40:31096/mcp" },
     "vikunja": { "type": "http", "url": "http://10.20.0.40:31097/mcp" },
     "neo4j": { "type": "http", "url": "http://10.20.0.40:31098/mcp" },
-    "tasmota": { "type": "http", "url": "http://10.20.0.40:31100/mcp" },
-    "github": { "type": "http", "url": "http://10.20.0.40:31111/mcp" },
-    "wikipedia": { "type": "http", "url": "http://10.20.0.40:31112/mcp" },
-    "reddit": { "type": "http", "url": "http://10.20.0.40:31104/mcp" },
     "outline": { "type": "http", "url": "http://10.20.0.40:31114/mcp" },
     "observability": { "type": "http", "url": "http://observability-mcp.agentic.kernow.io/mcp" },
-    "external": { "type": "http", "url": "http://external-mcp.agentic.kernow.io/mcp" }
+    "external": { "type": "http", "url": "http://external-mcp.agentic.kernow.io/mcp" },
+    "media": { "type": "http", "url": "http://media-mcp.agentic.kernow.io/mcp" },
+    "home": { "type": "http", "url": "http://home-mcp.agentic.kernow.io/mcp" }
   }
 }

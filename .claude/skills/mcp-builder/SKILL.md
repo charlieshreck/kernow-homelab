@@ -118,16 +118,26 @@ async def health_check(request):
 async def ready_check(request):
     return JSONResponse({"ready": True})
 
-app = Starlette(routes=[
-    Route("/health", health_check),
-    Route("/ready", ready_check),
-    Mount("/", app=mcp.get_asgi_app()),
-])
+# Use http_app() for stateless HTTP MCP transport
+mcp_app = mcp.http_app()
 
-if __name__ == "__main__":
+app = Starlette(
+    routes=[
+        Route("/health", health_check, methods=["GET"]),
+        Route("/ready", ready_check, methods=["GET"]),
+        Mount("/", app=mcp_app),
+    ],
+    lifespan=mcp_app.lifespan
+)
+
+def main():
     port = int(os.environ.get("PORT", 8000))
     host = os.environ.get("HOST", "0.0.0.0")
+    logger.info(f"Starting <domain>-mcp on {host}:{port}")
     uvicorn.run(app, host=host, port=port)
+
+if __name__ == "__main__":
+    main()
 ```
 
 ### 4. Create Tool Modules
@@ -409,16 +419,50 @@ curl http://10.20.0.40:<nodeport>/health
 5. **Secrets**: Reference existing K8s secrets, don't create new ones unless needed
 6. **verify=False**: Use for internal HTTPS services with self-signed certs
 
+## DNS and Ingress
+
+**IMPORTANT**: No AdGuard rewrites needed for domain MCPs!
+
+The agentic cluster has a wildcard DNS entry in **Unbound** (not AdGuard):
+- `*.agentic.kernow.io` → `10.20.0.90` (Agentic Traefik LB)
+
+When you create a domain MCP:
+1. Create the Ingress in the K8s manifest (see template above)
+2. DNS automatically resolves via the Unbound wildcard
+3. TLS handled by `wildcard-agentic-kernow-io` certificate
+
+Test with: `curl -sk https://<domain>-mcp.agentic.kernow.io/health`
+
+## Client Configuration
+
+After deploying a domain MCP, update client configurations:
+
+### Claude Code (/.mcp.json)
+
+```json
+{
+  "mcpServers": {
+    "<domain>": { "type": "http", "url": "https://<domain>-mcp.agentic.kernow.io/mcp" }
+  }
+}
+```
+
+### LangGraph / Alerting Pipeline
+
+Update environment variables in K8s manifests:
+- `<SERVICE>_MCP_URL=http://<domain>-mcp:8000` (in-cluster)
+- Or use domain URL for external access
+
 ## Existing Domains
 
-| Domain | Port | Consolidates | Status |
-|--------|------|--------------|--------|
-| observability | 31120 | keep, coroot, monitoring, gatus | Deployed |
-| external | 31121 | web-search, github, reddit, wikipedia, browser-automation | Deployed |
-| media | 31123 | plex, arr-suite | Deployed |
-| home | TBD | home-assistant, tasmota, unifi, adguard, homepage | Planned |
-| knowledge | TBD | knowledge, neo4j, outline, vikunja | Planned |
-| infrastructure | TBD | infrastructure, proxmox, truenas, cloudflare, opnsense, infisical | Planned |
+| Domain | Port | URL | Consolidates | Status |
+|--------|------|-----|--------------|--------|
+| observability | 31120 | observability-mcp.agentic.kernow.io | keep, coroot, monitoring, gatus | ✅ Deployed |
+| external | 31121 | external-mcp.agentic.kernow.io | web-search, github, reddit, wikipedia, browser-automation | ✅ Deployed |
+| media | 31123 | media-mcp.agentic.kernow.io | plex, arr-suite | ✅ Deployed |
+| home | 31124 | home-mcp.agentic.kernow.io | home-assistant, tasmota, unifi, adguard, homepage | ✅ Deployed |
+| knowledge | TBD | knowledge-mcp.agentic.kernow.io | knowledge, neo4j, outline, vikunja | Planned |
+| infrastructure | TBD | infrastructure-mcp.agentic.kernow.io | infrastructure, proxmox, truenas, cloudflare, opnsense, infisical | Planned |
 
 ## Secrets Reference
 
