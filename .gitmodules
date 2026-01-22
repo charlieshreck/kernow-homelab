@@ -7,3 +7,6 @@
 [submodule "monit_homelab"]
 	path = monit_homelab
 	url = git@github.com:charlieshreck/monit_homelab.git
+[submodule "mcp-servers"]
+	path = mcp-servers
+	url = git@github.com:charlieshreck/kernow-mcp-servers.git
