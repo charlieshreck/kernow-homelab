@@ -25,6 +25,6 @@
     "wikipedia": { "type": "http", "url": "http://10.20.0.40:31112/mcp" },
     "reddit": { "type": "http", "url": "http://10.20.0.40:31104/mcp" },
     "outline": { "type": "http", "url": "http://10.20.0.40:31114/mcp" },
-    "observability": { "type": "http", "url": "http://10.20.0.40:31121/mcp" }
+    "observability": { "type": "http", "url": "http://observability-mcp.agentic.kernow.io/mcp" }
   }
 }
