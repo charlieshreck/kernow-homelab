@@ -11,7 +11,7 @@ MESSAGE="$2"
 
 if [[ -z "$SUBMODULE" || -z "$MESSAGE" ]]; then
     echo "Usage: $0 <submodule> <message>"
-    echo "Submodules: agentic_lab, prod_homelab, monit_homelab"
+    echo "Submodules: agentic_lab, prod_homelab, monit_homelab, mcp-servers"
     exit 1
 fi
 
