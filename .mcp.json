@@ -1,7 +1,6 @@
 {
   "mcpServers": {
     "infisical": { "type": "http", "url": "http://10.20.0.40:31080/mcp" },
-    "coroot": { "type": "http", "url": "http://10.20.0.40:31081/mcp" },
     "proxmox": { "type": "http", "url": "http://10.20.0.40:31082/mcp" },
     "infrastructure": { "type": "http", "url": "http://10.20.0.40:31083/mcp" },
     "knowledge": { "type": "http", "url": "http://10.20.0.40:31084/mcp" },
@@ -19,8 +18,6 @@
     "vikunja": { "type": "http", "url": "http://10.20.0.40:31097/mcp" },
     "neo4j": { "type": "http", "url": "http://10.20.0.40:31098/mcp" },
     "tasmota": { "type": "http", "url": "http://10.20.0.40:31100/mcp" },
-    "monitoring": { "type": "http", "url": "http://10.20.0.40:31101/mcp" },
-    "keep": { "type": "http", "url": "http://10.20.0.40:31107/mcp" },
     "github": { "type": "http", "url": "http://10.20.0.40:31111/mcp" },
     "wikipedia": { "type": "http", "url": "http://10.20.0.40:31112/mcp" },
     "reddit": { "type": "http", "url": "http://10.20.0.40:31104/mcp" },
