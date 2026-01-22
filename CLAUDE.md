@@ -12,7 +12,12 @@ This repository uses git submodules to organize the three cluster configurations
 ├── CLAUDE.md                       # This file
 ├── agentic_lab/                    # Submodule: AI platform cluster (10.20.0.0/24)
 ├── prod_homelab/                   # Submodule: Production cluster (10.10.0.0/24)
-└── monit_homelab/                  # Submodule: Monitoring cluster (10.30.0.0/24)
+├── monit_homelab/                  # Submodule: Monitoring cluster (10.30.0.0/24)
+└── mcp-servers/                    # Submodule: Consolidated MCP server codebase
+    ├── domains/                    # Domain-based MCP servers
+    │   └── observability/          # Keep + Coroot + monitoring + Gatus
+    ├── shared/                     # Common utilities (kernow_mcp_common)
+    └── kubernetes/                 # K8s manifests for domain MCPs
 ```
 
 ## Cluster Overview
@@ -99,6 +104,35 @@ All 24 MCP servers run in the agentic cluster (ai-platform namespace) and are co
 | wikipedia | 31112 | Wikipedia articles, search, knowledge retrieval |
 | reddit | 31104 | Reddit browsing, subreddit search, discussions |
 | outline | 31114 | Outline wiki document management, collections |
+
+## MCP Architecture Modernization
+
+The MCP infrastructure is transitioning from ConfigMap-embedded Python to pre-built Docker images:
+
+### Current State (Phase 1)
+- 24 individual MCPs with `stateless_http=True` for Kubernetes stability
+- Code embedded in ConfigMaps (slow startup due to pip install)
+
+### Target State (Phase 2+)
+- 6 consolidated domain-based MCPs with pre-built Docker images
+- Domains: observability, infrastructure, knowledge, home, media, external
+
+### Consolidated MCP Domains
+
+| Domain | Port | Combines |
+|--------|------|----------|
+| observability-mcp | 31120 | Keep + Coroot + monitoring + Gatus |
+| infrastructure-mcp | TBD | K8s + Proxmox + TrueNAS + Cloudflare + OPNsense |
+| knowledge-mcp | TBD | Qdrant + Outline + Neo4j |
+| home-mcp | TBD | Home Assistant + Tasmota + UniFi + AdGuard |
+| media-mcp | TBD | Plex + Arr-Suite + Tautulli |
+| external-mcp | TBD | Web Search + GitHub + Reddit + Wikipedia |
+
+### Development
+See `mcp-servers/README.md` for:
+- Domain structure and tool organization
+- Dockerfile build process
+- Local development workflow
 
 ## Kubeconfig Paths
 
