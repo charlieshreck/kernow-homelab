@@ -1,18 +1,28 @@
 {
   "mcpServers": {
-    "infisical": { "type": "http", "url": "http://10.20.0.40:31080/mcp" },
-    "proxmox": { "type": "http", "url": "http://10.20.0.40:31082/mcp" },
-    "infrastructure": { "type": "http", "url": "http://10.20.0.40:31083/mcp" },
-    "knowledge": { "type": "http", "url": "http://10.20.0.40:31084/mcp" },
-    "opnsense": { "type": "http", "url": "http://10.20.0.40:31085/mcp" },
-    "cloudflare": { "type": "http", "url": "http://10.20.0.40:31087/mcp" },
-    "truenas": { "type": "http", "url": "http://10.20.0.40:31089/mcp" },
-    "vikunja": { "type": "http", "url": "http://10.20.0.40:31097/mcp" },
-    "neo4j": { "type": "http", "url": "http://10.20.0.40:31098/mcp" },
-    "outline": { "type": "http", "url": "http://10.20.0.40:31114/mcp" },
-    "observability": { "type": "http", "url": "http://observability-mcp.agentic.kernow.io/mcp" },
-    "external": { "type": "http", "url": "http://external-mcp.agentic.kernow.io/mcp" },
-    "media": { "type": "http", "url": "http://media-mcp.agentic.kernow.io/mcp" },
-    "home": { "type": "http", "url": "http://home-mcp.agentic.kernow.io/mcp" }
+    "observability": {
+      "type": "http",
+      "url": "http://observability-mcp.agentic.kernow.io/mcp"
+    },
+    "external": {
+      "type": "http",
+      "url": "http://external-mcp.agentic.kernow.io/mcp"
+    },
+    "media": {
+      "type": "http",
+      "url": "http://media-mcp.agentic.kernow.io/mcp"
+    },
+    "home": {
+      "type": "http",
+      "url": "http://home-mcp.agentic.kernow.io/mcp"
+    },
+    "knowledge": {
+      "type": "http",
+      "url": "http://knowledge-mcp.agentic.kernow.io/mcp"
+    },
+    "infrastructure": {
+      "type": "http",
+      "url": "http://infrastructure-mcp.agentic.kernow.io/mcp"
+    }
   }
 }
