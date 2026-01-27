@@ -42,31 +42,36 @@ git submodule update --init --recursive
 git submodule update --remote
 ```
 
-### Work in a Submodule (Manual)
+### Work in a Submodule (Helper Script - PREFERRED)
 ```bash
-cd agentic_lab/  # or prod_homelab/ or monit_homelab/
-# ... make changes ...
-git add . && git commit -m "message" && git push
-
-# Return to parent and update reference
-cd ..
-git add agentic_lab
-git commit -m "Update agentic_lab submodule"
-git push
-```
-
-### Work in a Submodule (Helper Script - Preferred)
-```bash
-# Single command: commits submodule, pushes, updates parent
+# Single command: stages all, commits, pushes submodule, updates + pushes parent
 /home/scripts/git-commit-submodule.sh agentic_lab "feat: add new feature"
 /home/scripts/git-commit-submodule.sh monit_homelab "fix: update config"
 /home/scripts/git-commit-submodule.sh prod_homelab "docs: update readme"
 ```
 
-**IMPORTANT for Claude**: Always use the helper script to avoid:
-- Committing in wrong directory (parent vs submodule)
-- Forgetting to update parent submodule reference
-- Push failures from incorrect working directory
+### Work in a Submodule (Manual with `git -C`)
+
+**CRITICAL**: The working directory is `/home` (parent repo). `cd` does NOT persist
+between shell commands. Always use `git -C <path>` to target the correct repo.
+
+```bash
+# Step 1: Stage and commit INSIDE the submodule
+git -C /home/agentic_lab add -A
+git -C /home/agentic_lab commit -m "feat: my change"
+git -C /home/agentic_lab push origin main
+
+# Step 2: Update parent repo's submodule pointer
+git -C /home add agentic_lab
+git -C /home commit -m "chore: update agentic_lab submodule"
+git -C /home push origin main
+```
+
+**IMPORTANT for Claude**:
+- ALWAYS use `git -C <path>` - never rely on `cd` for git operations
+- ALWAYS use the helper script when possible (handles both steps automatically)
+- NEVER run bare `git add -A && git commit` - this operates on `/home` (parent), not the submodule
+- The two-step process is mandatory: commit in submodule first, then update parent reference
 
 ### Clone Fresh
 ```bash
