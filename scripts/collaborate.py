@@ -657,6 +657,8 @@ class CollaborationOrchestrator:
 
     def invoke_gemini(self, action: str, payload: Dict) -> Dict:
         """Invoke Gemini with a collaboration skill."""
+        import time
+
         prompt = json.dumps(payload, indent=2)
 
         self._log(f"Invoking Gemini: {action}")
@@ -669,18 +671,39 @@ class CollaborationOrchestrator:
         ]
 
         try:
-            result = subprocess.run(
+            print(f"  Gemini ({action})...", end="", flush=True)
+            start_time = time.time()
+
+            proc = subprocess.Popen(
                 cmd,
-                capture_output=True,
-                text=True,
-                timeout=300
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
             )
 
-            if result.returncode != 0:
-                self._log(f"Gemini error: {result.stderr}", "ERROR")
-                return {"status": "error", "error": result.stderr}
+            # Poll with progress indication
+            while proc.poll() is None:
+                elapsed = int(time.time() - start_time)
+                if elapsed > 0 and elapsed % 10 == 0:
+                    print(".", end="", flush=True)
+                time.sleep(1)
+                if elapsed >= 300:
+                    proc.kill()
+                    proc.wait()
+                    print(" timeout!", flush=True)
+                    self._log("Gemini invocation timed out", "ERROR")
+                    return {"status": "error", "error": "timeout"}
 
-            output = result.stdout
+            elapsed = int(time.time() - start_time)
+            stdout, stderr = proc.communicate()
+
+            if proc.returncode != 0:
+                print(f" error ({elapsed}s)", flush=True)
+                self._log(f"Gemini error: {stderr}", "ERROR")
+                return {"status": "error", "error": stderr}
+
+            print(f" done ({elapsed}s)", flush=True)
+            output = stdout
 
             # Log raw response for debugging (truncated)
             self._log(f"Gemini raw response (first 500 chars): {output[:500]}")
@@ -689,33 +712,63 @@ class CollaborationOrchestrator:
             self._log(f"Gemini response parsed, keys: {list(response.keys())}")
             return response
 
-        except subprocess.TimeoutExpired:
-            self._log("Gemini invocation timed out", "ERROR")
-            return {"status": "error", "error": "timeout"}
         except Exception as e:
+            print(f" failed: {e}", flush=True)
             self._log(f"Gemini invocation failed: {e}", "ERROR")
             return {"status": "error", "error": str(e)}
 
-    def _parse_gemini_response(self, output: str) -> Dict:
-        """Parse Gemini response, handling various formats including JSON in markdown."""
+    def _unwrap_gemini_envelope(self, parsed: Dict) -> Dict:
+        """Unwrap the Gemini CLI envelope {session_id, response, stats}.
+
+        The Gemini CLI wraps the actual response in an envelope. The inner
+        'response' field is a string that may contain markdown-fenced JSON
+        with the actual workflow data.
+        """
         import re
 
-        # First, strip markdown code blocks to avoid picking up JSON examples
-        # This removes ```json ... ``` blocks that might contain example JSON
-        clean_output = re.sub(r'```(?:json|python|cypher)?\n.*?```', '', output, flags=re.DOTALL)
+        if not (isinstance(parsed, dict) and "session_id" in parsed and "response" in parsed):
+            return parsed
 
-        # Try to find JSON in cleaned output first
+        inner = parsed["response"]
+        if not isinstance(inner, str):
+            return parsed
+
+        self._log("Unwrapping Gemini CLI envelope")
+
+        # Strip markdown code fences from the inner response string
+        inner_clean = re.sub(r'```(?:json|python|cypher)?\s*\n?', '', inner).strip()
+
+        # Try direct JSON parse
         try:
-            return json.loads(clean_output.strip())
+            result = json.loads(inner_clean)
+            if isinstance(result, dict):
+                self._log(f"Unwrapped envelope, inner keys: {list(result.keys())}")
+                return result
         except json.JSONDecodeError:
             pass
 
-        # Find JSON object(s) in the cleaned output
-        json_objects = []
+        # Extract JSON objects from the inner string
+        inner_objects = self._extract_json_objects(inner_clean)
+        if not inner_objects:
+            inner_objects = self._extract_json_objects(inner)
+
+        if inner_objects:
+            best = self._select_best_json(inner_objects)
+            if best:
+                self._log(f"Unwrapped envelope via extraction, inner keys: {list(best.keys())}")
+                return best
+
+        # Couldn't unwrap — return envelope as-is
+        self._log("Could not unwrap Gemini envelope, using raw", "WARNING")
+        return parsed
+
+    def _extract_json_objects(self, text: str) -> List[Dict]:
+        """Extract all top-level JSON objects from a string."""
+        objects = []
         brace_count = 0
         start_idx = None
 
-        for i, char in enumerate(clean_output):
+        for i, char in enumerate(text):
             if char == '{':
                 if brace_count == 0:
                     start_idx = i
@@ -724,53 +777,68 @@ class CollaborationOrchestrator:
                 brace_count -= 1
                 if brace_count == 0 and start_idx is not None:
                     try:
-                        obj = json.loads(clean_output[start_idx:i+1])
-                        json_objects.append(obj)
+                        obj = json.loads(text[start_idx:i+1])
+                        objects.append(obj)
                     except json.JSONDecodeError:
                         pass
                     start_idx = None
 
-        # If nothing found in cleaned output, try original (in case response IS the JSON)
-        if not json_objects:
-            try:
-                return json.loads(output.strip())
-            except json.JSONDecodeError:
-                pass
+        return objects
 
-            # Last resort: find JSON in original
-            brace_count = 0
-            start_idx = None
-            for i, char in enumerate(output):
-                if char == '{':
-                    if brace_count == 0:
-                        start_idx = i
-                    brace_count += 1
-                elif char == '}':
-                    brace_count -= 1
-                    if brace_count == 0 and start_idx is not None:
-                        try:
-                            obj = json.loads(output[start_idx:i+1])
-                            json_objects.append(obj)
-                        except json.JSONDecodeError:
-                            pass
-                        start_idx = None
+    def _select_best_json(self, objects: List[Dict]) -> Optional[Dict]:
+        """Select the JSON object most likely to be the workflow response."""
+        expected_fields = {'verdict', 'major_issues', 'confidence', 'sections_added',
+                          'checklist', 'status', 'action', 'output_document_id',
+                          'sign_off', 'remaining_concerns', 'notes_for_claude'}
+        for obj in objects:
+            if any(field in obj for field in expected_fields):
+                self._log(f"Selected JSON with fields: {[f for f in expected_fields if f in obj]}")
+                return obj
+
+        if objects:
+            largest = max(objects, key=lambda x: len(str(x)))
+            self._log(f"Using largest JSON object with keys: {list(largest.keys())[:5]}")
+            return largest
+
+        return None
+
+    def _parse_gemini_response(self, output: str) -> Dict:
+        """Parse Gemini response, handling various formats including JSON in markdown."""
+        import re
+
+        # Try direct parse first (fastest path)
+        try:
+            parsed = json.loads(output.strip())
+            if isinstance(parsed, dict):
+                return self._unwrap_gemini_envelope(parsed)
+        except json.JSONDecodeError:
+            pass
+
+        # Strip markdown code blocks that might contain example JSON
+        clean_output = re.sub(r'```(?:json|python|cypher)?\n.*?```', '', output, flags=re.DOTALL)
+
+        # Try cleaned output
+        try:
+            parsed = json.loads(clean_output.strip())
+            if isinstance(parsed, dict):
+                return self._unwrap_gemini_envelope(parsed)
+        except json.JSONDecodeError:
+            pass
+
+        # Extract JSON objects from cleaned output, then original
+        json_objects = self._extract_json_objects(clean_output)
+        if not json_objects:
+            json_objects = self._extract_json_objects(output)
 
         if not json_objects:
             self._log("No valid JSON found in Gemini response", "WARNING")
             return {"status": "complete", "raw_response": output}
 
-        # If multiple JSON objects, find the one with expected workflow fields
-        expected_fields = {'verdict', 'major_issues', 'confidence', 'sections_added',
-                          'checklist', 'status', 'action', 'output_document_id'}
-        for obj in json_objects:
-            if any(field in obj for field in expected_fields):
-                self._log(f"Found response JSON with fields: {[f for f in expected_fields if f in obj]}")
-                return obj
+        best = self._select_best_json(json_objects)
+        if best:
+            return self._unwrap_gemini_envelope(best)
 
-        # Return the largest object if no expected fields found
-        largest = max(json_objects, key=lambda x: len(str(x)))
-        self._log(f"Using largest JSON object with keys: {list(largest.keys())[:5]}")
-        return largest
+        return self._unwrap_gemini_envelope(json_objects[0])
 
     # --- Conflict Detection ---
 
