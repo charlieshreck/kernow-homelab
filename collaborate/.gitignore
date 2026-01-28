@@ -1,0 +1,4 @@
+# Collaboration workflow runtime data
+state/*.json
+state/archive/
+logs/*.log
